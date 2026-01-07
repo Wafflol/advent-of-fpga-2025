@@ -1,0 +1,10 @@
+(env
+  (dev
+    (flags (:standard -w -32-8-26
+))))
+
+(library
+ (name day_3) 
+ (libraries core hardcaml)
+ (preprocess
+  (pps ppx_hardcaml ppx_jane)))

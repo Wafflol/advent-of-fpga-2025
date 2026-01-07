@@ -1,0 +1,13 @@
+(env
+  (dev
+    (flags (:standard -w -32-8-26
+))))
+
+(library
+ (name test_lib_name)
+ (libraries core hardcaml day_3 hardcaml_test_harness
+   hardcaml_waveterm re stdlib core_unix)
+ (preprocess
+  (pps ppx_hardcaml ppx_jane))
+ (inline_tests (deps input.txt)))
+

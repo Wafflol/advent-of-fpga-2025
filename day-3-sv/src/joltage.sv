@@ -11,7 +11,7 @@ module joltage #(parameter int LENGTH = 100) (
     * it then takes in a line of length LENGTH and sets done to low
     * then it calculates the max joltage from it
     * it then sets done to high and adds the value to p1_out and p2_out
-    * The module then waits for data_valid to be high again and repeats
+    * The module then waits for start and then data_valid to be high again and repeats
     *
     * this can be repeated for any amount of lines (assert start first)
     */

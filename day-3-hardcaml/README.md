@@ -14,5 +14,5 @@ The testbench is similar to the SystemVerilog version, and it prints out the fin
 
 ## How to run
 
-To run the design, replace input.txt in the test directory, and in the main directory, run `dune build bin/generate.exe @runtest` and `dune promote`.
+To run the design, replace input.txt with your own desired input file in the test directory, and in the main directory, run `dune build bin/generate.exe @runtest` and `dune promote`.
 The outputs should appear in test/test_circuit.ml

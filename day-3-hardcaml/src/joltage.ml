@@ -73,111 +73,111 @@ let create (i: _ I.t) =
                 joltage_1_reg <-- of_string "16'd0";
                 joltage_2_reg <-- of_string "64'd0";
 
-                 when_ i.start [sm.set_next Data_in]
+                when_ i.start [sm.set_next Data_in]
             ] )
         ; ( Data_in
           , [ 
                 when_ i.data_valid [
-                            counter <-- of_int_trunc 0 ~width:counter_size;
-                            buffer <-- i.line.:[line_length-1, 8];
-                            shift_1 <-- i.line.:[(char_pos 2) - 1, 0];
-                            shift_2 <-- i.line.:[(char_pos 12) - 1, 0];
-                            sm.set_next Calc;
+                    counter <-- of_int_trunc 0 ~width:counter_size;
+                    buffer <-- i.line.:[line_length-1, 8];
+                    shift_1 <-- i.line.:[(char_pos 2) - 1, 0];
+                    shift_2 <-- i.line.:[(char_pos 12) - 1, 0];
+                    sm.set_next Calc;
                 ]
             ] )
         ; ( Calc
           , [ 
-                        shift_1_en <-- ((buffer.value.:[(char_pos 1) - 1,0]) >=: (shift_1.value.:[(char_pos 2) - 1,(char_pos 1)]))
-                                        @: ((shift_1.value.:[(char_pos 2) - 1,(char_pos 1)])  >=: (shift_1.value.:[(char_pos 1) - 1,0]));
-                        shift_1 <-- cases (leading_ones shift_1_en.value) ~default: shift_1.value
-                            [
-                                of_int_trunc ~width:2 1,buffer.value.:[(char_pos 1) - 1,0] @: shift_1.value.:[(char_pos 1) - 1,0];
-                                of_int_trunc ~width:2 2,buffer.value.:[(char_pos 1) - 1,0] @: shift_1.value.:[(char_pos 2) - 1,char_pos 1]
-                            ];
+                shift_1_en <-- ((buffer.value.:[(char_pos 1) - 1,0]) >=: (shift_1.value.:[(char_pos 2) - 1,(char_pos 1)]))
+                                @: ((shift_1.value.:[(char_pos 2) - 1,(char_pos 1)])  >=: (shift_1.value.:[(char_pos 1) - 1,0]));
+                shift_1 <-- cases (leading_ones shift_1_en.value) ~default: shift_1.value
+                    [
+                        of_int_trunc ~width:2 1,buffer.value.:[(char_pos 1) - 1,0] @: shift_1.value.:[(char_pos 1) - 1,0];
+                        of_int_trunc ~width:2 2,buffer.value.:[(char_pos 1) - 1,0] @: shift_1.value.:[(char_pos 2) - 1,char_pos 1]
+                    ];
 
-                        (* part two only starts after part 1 has processed (12 - 2 = 10) digits *)
-                        when_ (counter.value >: (of_int_trunc (9) ~width:counter_size))
-                            [ 
-                                shift_2_en <-- ((buffer.value.:[(char_pos 1) - 1,0]) >=: (shift_2.value.:[(char_pos 12) - 1,char_pos 11]))
-                                                @: ((shift_2.value.:[(char_pos 12) - 1,char_pos 11]) >=: (shift_2.value.:[(char_pos 11) - 1,char_pos 10]))
-                                                @: ((shift_2.value.:[(char_pos 11) - 1,char_pos 10]) >=: (shift_2.value.:[(char_pos 10) - 1,char_pos 9]))
-                                                @: ((shift_2.value.:[(char_pos 10) - 1,char_pos 9]) >=: (shift_2.value.:[(char_pos 9) - 1,char_pos 8]))
-                                                @: ((shift_2.value.:[(char_pos 9) - 1,char_pos 8]) >=: (shift_2.value.:[(char_pos 8) - 1,char_pos 7]))
-                                                @: ((shift_2.value.:[(char_pos 8) - 1,char_pos 7]) >=: (shift_2.value.:[(char_pos 7) - 1,char_pos 6]))
-                                                @: ((shift_2.value.:[(char_pos 7) - 1,char_pos 6]) >=: (shift_2.value.:[(char_pos 6) - 1,char_pos 5]))
-                                                @: ((shift_2.value.:[(char_pos 6) - 1,char_pos 5]) >=: (shift_2.value.:[(char_pos 5) - 1,char_pos 4]))
-                                                @: ((shift_2.value.:[(char_pos 5) - 1,char_pos 4]) >=: (shift_2.value.:[(char_pos 4) - 1,char_pos 3]))
-                                                @: ((shift_2.value.:[(char_pos 4) - 1,char_pos 3]) >=: (shift_2.value.:[(char_pos 3) - 1,char_pos 2]))
-                                                @: ((shift_2.value.:[(char_pos 3) - 1,char_pos 2]) >=: (shift_2.value.:[(char_pos 2) - 1,char_pos 1]))
-                                                @: ((shift_2.value.:[(char_pos 2) - 1,char_pos 1]) >=: (shift_2.value.:[(char_pos 1) - 1,char_pos 0]));
-                                shift_2 <-- cases (leading_ones shift_2_en.value) ~default:shift_2.value
-                                [
-                                    of_int_trunc ~width:4 1,buffer.value.:[3,0] @: shift_2.value.:[(char_pos 11) - 1,0];
-                                    of_int_trunc ~width:4 2,buffer.value.:[3,0] @: shift_2.value.:[(char_pos 12) - 1,char_pos 11] @: shift_2.value.:[(char_pos 10) - 1,0];
-                                    of_int_trunc ~width:4 3,buffer.value.:[3,0] @: shift_2.value.:[(char_pos 12) - 1,char_pos 10] @: shift_2.value.:[(char_pos 9) - 1,0];
-                                    of_int_trunc ~width:4 4,buffer.value.:[3,0] @: shift_2.value.:[(char_pos 12) - 1,char_pos 9] @: shift_2.value.:[(char_pos 8) - 1,0];
-                                    of_int_trunc ~width:4 5,buffer.value.:[3,0] @: shift_2.value.:[(char_pos 12) - 1,char_pos 8] @: shift_2.value.:[(char_pos 7) - 1,0];
-                                    of_int_trunc ~width:4 6,buffer.value.:[3,0] @: shift_2.value.:[(char_pos 12) - 1,char_pos 7] @: shift_2.value.:[(char_pos 6) - 1,0];
-                                    of_int_trunc ~width:4 7,buffer.value.:[3,0] @: shift_2.value.:[(char_pos 12) - 1,char_pos 6] @: shift_2.value.:[(char_pos 5) - 1,0];
-                                    of_int_trunc ~width:4 8,buffer.value.:[3,0] @: shift_2.value.:[(char_pos 12) - 1,char_pos 5] @: shift_2.value.:[(char_pos 4) - 1,0];
-                                    of_int_trunc ~width:4 9,buffer.value.:[3,0] @: shift_2.value.:[(char_pos 12) - 1,char_pos 4] @: shift_2.value.:[(char_pos 3) - 1,0];
-                                    of_int_trunc ~width:4 10,buffer.value.:[3,0] @: shift_2.value.:[(char_pos 12) - 1,char_pos 3] @: shift_2.value.:[(char_pos 2) - 1,0];
-                                    of_int_trunc ~width:4 11,buffer.value.:[3,0] @: shift_2.value.:[(char_pos 12) - 1,char_pos 2] @: shift_2.value.:[(char_pos 1) - 1,0];
-                                    of_int_trunc ~width:4 12,buffer.value.:[3,0] @: shift_2.value.:[(char_pos 12) - 1,char_pos 1];
-                                ];
-                            ];
+                (* part two only starts after part 1 has processed (12 - 2 = 10) digits *)
+                when_ (counter.value >: (of_int_trunc (9) ~width:counter_size))
+                    [ 
+                        shift_2_en <-- ((buffer.value.:[(char_pos 1) - 1,0]) >=: (shift_2.value.:[(char_pos 12) - 1,char_pos 11]))
+                                        @: ((shift_2.value.:[(char_pos 12) - 1,char_pos 11]) >=: (shift_2.value.:[(char_pos 11) - 1,char_pos 10]))
+                                        @: ((shift_2.value.:[(char_pos 11) - 1,char_pos 10]) >=: (shift_2.value.:[(char_pos 10) - 1,char_pos 9]))
+                                        @: ((shift_2.value.:[(char_pos 10) - 1,char_pos 9]) >=: (shift_2.value.:[(char_pos 9) - 1,char_pos 8]))
+                                        @: ((shift_2.value.:[(char_pos 9) - 1,char_pos 8]) >=: (shift_2.value.:[(char_pos 8) - 1,char_pos 7]))
+                                        @: ((shift_2.value.:[(char_pos 8) - 1,char_pos 7]) >=: (shift_2.value.:[(char_pos 7) - 1,char_pos 6]))
+                                        @: ((shift_2.value.:[(char_pos 7) - 1,char_pos 6]) >=: (shift_2.value.:[(char_pos 6) - 1,char_pos 5]))
+                                        @: ((shift_2.value.:[(char_pos 6) - 1,char_pos 5]) >=: (shift_2.value.:[(char_pos 5) - 1,char_pos 4]))
+                                        @: ((shift_2.value.:[(char_pos 5) - 1,char_pos 4]) >=: (shift_2.value.:[(char_pos 4) - 1,char_pos 3]))
+                                        @: ((shift_2.value.:[(char_pos 4) - 1,char_pos 3]) >=: (shift_2.value.:[(char_pos 3) - 1,char_pos 2]))
+                                        @: ((shift_2.value.:[(char_pos 3) - 1,char_pos 2]) >=: (shift_2.value.:[(char_pos 2) - 1,char_pos 1]))
+                                        @: ((shift_2.value.:[(char_pos 2) - 1,char_pos 1]) >=: (shift_2.value.:[(char_pos 1) - 1,char_pos 0]));
+                        shift_2 <-- cases (leading_ones shift_2_en.value) ~default:shift_2.value
+                        [
+                            of_int_trunc ~width:4 1,buffer.value.:[3,0] @: shift_2.value.:[(char_pos 11) - 1,0];
+                            of_int_trunc ~width:4 2,buffer.value.:[3,0] @: shift_2.value.:[(char_pos 12) - 1,char_pos 11] @: shift_2.value.:[(char_pos 10) - 1,0];
+                            of_int_trunc ~width:4 3,buffer.value.:[3,0] @: shift_2.value.:[(char_pos 12) - 1,char_pos 10] @: shift_2.value.:[(char_pos 9) - 1,0];
+                            of_int_trunc ~width:4 4,buffer.value.:[3,0] @: shift_2.value.:[(char_pos 12) - 1,char_pos 9] @: shift_2.value.:[(char_pos 8) - 1,0];
+                            of_int_trunc ~width:4 5,buffer.value.:[3,0] @: shift_2.value.:[(char_pos 12) - 1,char_pos 8] @: shift_2.value.:[(char_pos 7) - 1,0];
+                            of_int_trunc ~width:4 6,buffer.value.:[3,0] @: shift_2.value.:[(char_pos 12) - 1,char_pos 7] @: shift_2.value.:[(char_pos 6) - 1,0];
+                            of_int_trunc ~width:4 7,buffer.value.:[3,0] @: shift_2.value.:[(char_pos 12) - 1,char_pos 6] @: shift_2.value.:[(char_pos 5) - 1,0];
+                            of_int_trunc ~width:4 8,buffer.value.:[3,0] @: shift_2.value.:[(char_pos 12) - 1,char_pos 5] @: shift_2.value.:[(char_pos 4) - 1,0];
+                            of_int_trunc ~width:4 9,buffer.value.:[3,0] @: shift_2.value.:[(char_pos 12) - 1,char_pos 4] @: shift_2.value.:[(char_pos 3) - 1,0];
+                            of_int_trunc ~width:4 10,buffer.value.:[3,0] @: shift_2.value.:[(char_pos 12) - 1,char_pos 3] @: shift_2.value.:[(char_pos 2) - 1,0];
+                            of_int_trunc ~width:4 11,buffer.value.:[3,0] @: shift_2.value.:[(char_pos 12) - 1,char_pos 2] @: shift_2.value.:[(char_pos 1) - 1,0];
+                            of_int_trunc ~width:4 12,buffer.value.:[3,0] @: shift_2.value.:[(char_pos 12) - 1,char_pos 1];
+                        ];
+                    ];
 
-                        buffer <-- (of_string "4'h0") @: (buffer.value.:[buffer_length - 1, 4]);
+                buffer <-- (of_string "4'h0") @: (buffer.value.:[buffer_length - 1, 4]);
 
-                        counter <-- counter.value +: (of_int_trunc 1 ~width:counter_size);
-                        when_ (counter.value ==: (of_int_trunc (line_digits- 3) ~width:counter_size))
-                            [ sm.set_next Sum; ]
+                counter <-- counter.value +: (of_int_trunc 1 ~width:counter_size);
+                when_ (counter.value ==: (of_int_trunc (line_digits- 3) ~width:counter_size))
+                    [ sm.set_next Sum; ]
             ] )
         ; ( Sum
           , [
-                    shift_1_bin <-- (
-                                shift_1.value.:[(char_pos 2)-1,char_pos 1] |> sig_mult_ten 
-                                |> sig_add ((of_int_trunc 0 ~width:4) @: shift_1.value.:[(char_pos 1) - 1,0])
-                        ).:[6,0];
-                    joltage_1_reg <-- (joltage_1_reg.value +: ((of_int_trunc 0 ~width:9) @: shift_1_bin.value));
+                shift_1_bin <-- (
+                        shift_1.value.:[(char_pos 2)-1,char_pos 1] |> sig_mult_ten 
+                        |> sig_add ((of_int_trunc 0 ~width:4) @: shift_1.value.:[(char_pos 1) - 1,0])
+                    ).:[6,0];
+                joltage_1_reg <-- (joltage_1_reg.value +: ((of_int_trunc 0 ~width:9) @: shift_1_bin.value));
 
-                    shift_2_bin <-- (
-                                shift_2.value.:[(char_pos 12)-1,char_pos 11]
-                                |> sig_mult_ten 
-                                |> sig_add ((of_int_trunc 0 ~width:4) @: shift_2.value.:[(char_pos 11) - 1,char_pos 10])
-                                |> sig_mult_ten
-                                |> sig_add ((of_int_trunc 0 ~width:8) @: shift_2.value.:[(char_pos 10) - 1,char_pos 9])
-                                |> sig_mult_ten
-                                |> sig_add ((of_int_trunc 0 ~width:12) @: shift_2.value.:[(char_pos 9) - 1,char_pos 8])
-                                |> sig_mult_ten
-                                |> sig_add ((of_int_trunc 0 ~width:16) @: shift_2.value.:[(char_pos 8) - 1,char_pos 7])
-                                |> sig_mult_ten
-                                |> sig_add ((of_int_trunc 0 ~width:20) @: shift_2.value.:[(char_pos 7) - 1,char_pos 6])
-                                |> sig_mult_ten
-                                |> sig_add ((of_int_trunc 0 ~width:24) @: shift_2.value.:[(char_pos 6) - 1,char_pos 5])
-                                |> sig_mult_ten
-                                |> sig_add ((of_int_trunc 0 ~width:28) @: shift_2.value.:[(char_pos 5) - 1,char_pos 4])
-                                |> sig_mult_ten
-                                |> sig_add ((of_int_trunc 0 ~width:32) @: shift_2.value.:[(char_pos 4) - 1,char_pos 3])
-                                |> sig_mult_ten
-                                |> sig_add ((of_int_trunc 0 ~width:36) @: shift_2.value.:[(char_pos 3) - 1,char_pos 2])
-                                |> sig_mult_ten
-                                |> sig_add ((of_int_trunc 0 ~width:40) @: shift_2.value.:[(char_pos 2) - 1,char_pos 1])
-                                |> sig_mult_ten
-                                |> sig_add ((of_int_trunc 0 ~width:44) @: shift_2.value.:[(char_pos 1) - 1,char_pos 0])
-                        ).:[39,0];
+                shift_2_bin <-- (
+                            shift_2.value.:[(char_pos 12)-1,char_pos 11]
+                            |> sig_mult_ten 
+                            |> sig_add ((of_int_trunc 0 ~width:4) @: shift_2.value.:[(char_pos 11) - 1,char_pos 10])
+                            |> sig_mult_ten
+                            |> sig_add ((of_int_trunc 0 ~width:8) @: shift_2.value.:[(char_pos 10) - 1,char_pos 9])
+                            |> sig_mult_ten
+                            |> sig_add ((of_int_trunc 0 ~width:12) @: shift_2.value.:[(char_pos 9) - 1,char_pos 8])
+                            |> sig_mult_ten
+                            |> sig_add ((of_int_trunc 0 ~width:16) @: shift_2.value.:[(char_pos 8) - 1,char_pos 7])
+                            |> sig_mult_ten
+                            |> sig_add ((of_int_trunc 0 ~width:20) @: shift_2.value.:[(char_pos 7) - 1,char_pos 6])
+                            |> sig_mult_ten
+                            |> sig_add ((of_int_trunc 0 ~width:24) @: shift_2.value.:[(char_pos 6) - 1,char_pos 5])
+                            |> sig_mult_ten
+                            |> sig_add ((of_int_trunc 0 ~width:28) @: shift_2.value.:[(char_pos 5) - 1,char_pos 4])
+                            |> sig_mult_ten
+                            |> sig_add ((of_int_trunc 0 ~width:32) @: shift_2.value.:[(char_pos 4) - 1,char_pos 3])
+                            |> sig_mult_ten
+                            |> sig_add ((of_int_trunc 0 ~width:36) @: shift_2.value.:[(char_pos 3) - 1,char_pos 2])
+                            |> sig_mult_ten
+                            |> sig_add ((of_int_trunc 0 ~width:40) @: shift_2.value.:[(char_pos 2) - 1,char_pos 1])
+                            |> sig_mult_ten
+                            |> sig_add ((of_int_trunc 0 ~width:44) @: shift_2.value.:[(char_pos 1) - 1,char_pos 0])
+                    ).:[39,0];
 
-                    joltage_2_reg <-- (joltage_2_reg.value +: ((of_int_trunc 0 ~width:24) @: shift_2_bin.value));
+                joltage_2_reg <-- (joltage_2_reg.value +: ((of_int_trunc 0 ~width:24) @: shift_2_bin.value));
 
-                    sm.set_next Done;
+                sm.set_next Done;
         ] )
         ; ( Done
           , [ 
-                    done_wire <-- vdd;
+                done_wire <-- vdd;
 
                 when_ i.start [
-                        sm.set_next Data_in
-                        ]
+                    sm.set_next Data_in
+                ]
             ] )
         ];
         joltage_1_wire <-- joltage_1_reg.value;(* buffer.value.:[15,0]; *)

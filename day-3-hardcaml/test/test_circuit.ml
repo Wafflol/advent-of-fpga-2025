@@ -70,7 +70,7 @@ let testbench (create_design_fn : Signal.t Circuit_to_test.I.t -> Signal.t Circu
 
 let%expect_test "something" = 
     let waves = testbench Circuit_to_test.create in
-    waves |> Waveform.print ~start_cycle:1000000
+    waves |> Waveform.print ~start_cycle: 1000000
         ~wave_width:2 ~display_width:100
         ~display_rules:
         Display_rule.[ 
@@ -83,8 +83,8 @@ let%expect_test "something" =
         ];
 (*             port_name_matches Re.Posix.(compile (re ".*"))] *)
     [%expect {|
-      jolts_1='17412'
-      jolts_2='172681562473501'
+      jolts_1='16842'
+      jolts_2='167523425665348'
       ┌Signals───────────┐┌Waves─────────────────────────────────────────────────────────────────────────┐
       │clock             ││┌──┐  ┌──┐  ┌──┐  ┌──┐  ┌──┐  ┌──┐  ┌──┐  ┌──┐  ┌──┐  ┌──┐  ┌──┐  ┌──┐  ┌──┐  │
       │                  ││   └──┘  └──┘  └──┘  └──┘  └──┘  └──┘  └──┘  └──┘  └──┘  └──┘  └──┘  └──┘  └──│
@@ -95,10 +95,10 @@ let%expect_test "something" =
       │done_sig          ││ 1                                                                            │
       │                  ││──────                                                                        │
       │                  ││──────                                                                        │
-      │joltage_1         ││ 17412                                                                        │
+      │joltage_1         ││ 16842                                                                        │
       │                  ││──────                                                                        │
       │                  ││──────                                                                        │
-      │joltage_2         ││ 1726.                                                                        │
+      │joltage_2         ││ 1675.                                                                        │
       │                  ││──────                                                                        │
       └──────────────────┘└──────────────────────────────────────────────────────────────────────────────┘
       |}];

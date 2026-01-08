@@ -38,16 +38,16 @@ Since part 2 is initialized with 12 digits instead of 2, and both parts share th
 
 Once all of the input has been processed, to convert BCD back into binary, it is trivial for part 1 (Joltage<sub>0</sub> * 10 + Joltage<sub>1</sub>).
 
-However, since multipliers with larger numbers are resource-intensive, to simplify the powers of 10, the sum was evaluated in 12 stages. Each stages multiplies the previous stage by 10 and and then adds one digit by splitting x*10 into x<<3 + x<<1.
+Since for part 2, the last digit needs to be multiplied by 10^11, it is simpler to reduce the multiplication into stages.
 
 Thus, the first few stages for part 2 look like:
 
 stage1 = Joltage<sub>0</sub>
-stage2 = stage1 << 3 + stage1 << 1 + Joltage<sub>1</sub>
-stage3 = stage2 << 3 + stage2 << 1 + Joltage<sub>2</sub>
+stage2 = stage1 * 10 + Joltage<sub>1</sub>
+stage3 = stage2 + Joltage<sub>2</sub>
 ...
 
-Stage 12 is then equal to Joltage<sub>0</sub> * 10^11 + Joltage<sub>1</sub> * 10^10 + ...
+Stage 12 is then equal to Joltage<sub>0</sub> * 10<sup>11</sup> + Joltage<sub>1</sub> * 10<sup>10</sup> + ...
 
 This gives the maximum joltage for the line in binary, and is added to the output register.
 

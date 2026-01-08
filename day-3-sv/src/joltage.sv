@@ -87,24 +87,24 @@ module joltage #(parameter int LENGTH = 100) (
     logic [39:0] stage1, stage2, stage3, stage4, stage5, stage6;
     logic [39:0] stage7, stage8, stage9, stage10, stage11, stage12;
 
-    always_comb begin : mult_add //this block iteratively sums the BCD using shifts
+    always_comb begin : mult_add //this block iteratively sums the BCD
         stage1  = p2_curr_jolt[0];
-        stage2  = ((stage1  << 3) + (stage1  << 1)) + p2_curr_jolt[1];
-        stage3  = ((stage2  << 3) + (stage2  << 1)) + p2_curr_jolt[2];
-        stage4  = ((stage3  << 3) + (stage3  << 1)) + p2_curr_jolt[3];
-        stage5  = ((stage4  << 3) + (stage4  << 1)) + p2_curr_jolt[4];
-        stage6  = ((stage5  << 3) + (stage5  << 1)) + p2_curr_jolt[5];
-        stage7  = ((stage6  << 3) + (stage6  << 1)) + p2_curr_jolt[6];
-        stage8  = ((stage7  << 3) + (stage7  << 1)) + p2_curr_jolt[7];
-        stage9  = ((stage8  << 3) + (stage8  << 1)) + p2_curr_jolt[8];
-        stage10 = ((stage9  << 3) + (stage9  << 1)) + p2_curr_jolt[9];
-        stage11 = ((stage10 << 3) + (stage10 << 1)) + p2_curr_jolt[10];
-        stage12 = ((stage11 << 3) + (stage11 << 1)) + p2_curr_jolt[11];
+        stage2  = (stage1  * 10) + p2_curr_jolt[1];
+        stage3  = (stage2  * 10) + p2_curr_jolt[2];
+        stage4  = (stage3  * 10) + p2_curr_jolt[3];
+        stage5  = (stage4  * 10) + p2_curr_jolt[4];
+        stage6  = (stage5  * 10) + p2_curr_jolt[5];
+        stage7  = (stage6  * 10) + p2_curr_jolt[6];
+        stage8  = (stage7  * 10) + p2_curr_jolt[7];
+        stage9  = (stage8  * 10) + p2_curr_jolt[8];
+        stage10 = (stage9  * 10) + p2_curr_jolt[9];
+        stage11 = (stage10 * 10) + p2_curr_jolt[10];
+        stage12 = (stage11 * 10) + p2_curr_jolt[11];
     end
 
     always_ff @(posedge clk) begin : p2_joltage_sum
         if (state == IDLE)
-            joltage2_out <= 16'd0;
+            joltage2_out <= 64'd0;
         else if (state == SUM) begin
             joltage2_out <= joltage2_out + stage12;
         end
